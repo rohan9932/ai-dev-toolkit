@@ -3,11 +3,11 @@ from pathlib import Path
 from unittest.mock import patch
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
-import cli,project_tools,routing,skill_manager as manager
+import cli,catalog_search,routing,skill_manager as manager
 init=manager.init
 
 
-class WorkflowTests(unittest.TestCase):
+class WorkflowFixture:
     def setUp(self):
         base=ROOT.parent/('.'+ROOT.name+'-test-runs');base.mkdir(exist_ok=True)
         self.temp=tempfile.TemporaryDirectory(dir=base);self.addCleanup(self.temp.cleanup)
@@ -27,8 +27,6 @@ class WorkflowTests(unittest.TestCase):
             shutil.copytree(ROOT/folder,self.toolkit/folder)
         for folder in ('agents','design','instructions'):
             shutil.copytree(ROOT/'library'/folder,self.toolkit/'library'/folder)
-        (self.toolkit/'scripts').mkdir()
-        for f in ('project_tools.py','team.py'):shutil.copyfile(ROOT/'scripts'/f,self.toolkit/'scripts'/f)
         catalog=json.loads((ROOT/'manifests/catalog.json').read_text(encoding='utf-8'))
         for s in catalog['skills']:
             if s['validation']['status']=='reviewed':shutil.copytree(ROOT/s['path'],self.toolkit/s['path'])
@@ -40,6 +38,9 @@ class WorkflowTests(unittest.TestCase):
             path.write_bytes(path.read_bytes()+b'\nNew upstream guidance.\n');s['fileHashes']['SKILL.md']=hashlib.sha256(path.read_bytes()).hexdigest()
         file.write_text(json.dumps(catalog),encoding='utf-8')
     def snapshot(self):return {p.relative_to(self.project).as_posix():p.read_bytes() for p in self.project.rglob('*') if p.is_file()}
+
+
+class WorkflowTests(WorkflowFixture,unittest.TestCase):
     def test_entire_toolkit_tree_is_rejected(self):
         for dest in (ROOT,ROOT/'library/new-project',ROOT/'.local/new-project'):
             with self.assertRaises(ValueError):self.plan(destination=dest)
@@ -64,35 +65,21 @@ class WorkflowTests(unittest.TestCase):
         for extra in ('frontend-implementation','professional-ui','wordpress-wp-plugin-development'):
             with self.assertRaises(ValueError):self.plan(extras=[extra])
         with self.assertRaises(ValueError):self.plan(capabilities=['imaginary'])
-    def test_compact_project_catalog_and_bounded_offline_search(self):
+    def test_small_project_and_central_search(self):
         self.install();self.assertLess((self.project/'.ai-toolkit/catalog.json').stat().st_size,20000)
-        index=project_tools.read(self.project/'.ai-toolkit/search-index.json')
-        result=project_tools.search(index,'wordpress',limit=3)
-        self.assertEqual(len(result),3)
-        with self.assertRaises(ValueError):project_tools.search(index,limit=1000)
-        r=subprocess.run([sys.executable,str(self.project/'.ai-toolkit/tools.py'),'search','database','--limit','2'],capture_output=True,text=True)
-        self.assertEqual(r.returncode,0,r.stderr);self.assertLessEqual(len(json.loads(r.stdout)),2)
-        self.assertEqual(project_tools.search(index,'php escaping',limit=1)[0]['id'],'php-development')
-        r=subprocess.run([sys.executable,str(self.project/'.ai-toolkit/tools.py'),'search','unfindable_topic'],capture_output=True,text=True)
+        self.assertFalse((self.project/'.ai-toolkit/search-index.json').exists())
+        self.assertEqual(list(self.project.rglob('*.py')),[])
+        r=subprocess.run([sys.executable,str(ROOT/'toolkit.py'),'search','php escaping','--limit','1'],capture_output=True,text=True)
+        self.assertEqual(r.returncode,0,r.stderr);self.assertEqual(json.loads(r.stdout)[0]['id'],'php-development')
+        with self.assertRaises(ValueError):catalog_search.search({'skills':[]},limit=1000)
+        r=subprocess.run([sys.executable,str(ROOT/'toolkit.py'),'search','unfindable_topic'],capture_output=True,text=True)
         self.assertEqual(json.loads(r.stdout),[]);self.assertIn('Try fewer terms',r.stderr)
-    def test_checkpoint_and_resume_survive_new_process(self):
-        self.install();project_tools.checkpoint(self.project,'Preview ready','Build the form',decision='Use warm colors',blocker='Need copy',evidence='preview.html inspected')
-        r=subprocess.run([sys.executable,str(self.project/'.ai-toolkit/tools.py'),'resume'],capture_output=True,text=True)
-        self.assertEqual(r.returncode,0,r.stderr);data=json.loads(r.stdout)
-        self.assertEqual(data['state']['nextTask'],'Build the form');self.assertIn('Need copy',data['state']['blockers'])
-        project_tools.checkpoint(self.project,'Copy ready','Build the form',blocker='')
-        self.assertEqual(project_tools.resume(self.project)['state']['blockers'],[])
-    def test_doctor_reports_missing_runtime_without_installing(self):
-        self.install(preset_id='php')
-        with patch.object(project_tools.shutil,'which',side_effect=lambda name:None if name=='php' else '/python'):
-            report=project_tools.doctor(self.project)
-        self.assertFalse(report['ready']);self.assertFalse(report['tools']['php'])
-    def test_add_preserves_brief_design_checkpoint_and_user_instructions(self):
+    def test_add_preserves_brief_design_handoff_and_user_instructions(self):
         self.install();agents=self.project/'AGENTS.md';agents.write_bytes(agents.read_bytes()+b'\nUser instruction: keep the logo.\n')
-        for file in ('docs/PROJECT-BRIEF.md','docs/DESIGN-CONTRACT.md','.ai-team/state.json'):(self.project/file).write_text('User content')
+        for file in ('docs/PROJECT-BRIEF.md','docs/DESIGN-CONTRACT.md','docs/HANDOFF.md'):(self.project/file).write_text('User content')
         tid,_=self.run_changes(['block-testing-strategy'])
         self.assertTrue(tid);self.assertIn('keep the logo',agents.read_text())
-        for file in ('docs/PROJECT-BRIEF.md','docs/DESIGN-CONTRACT.md','.ai-team/state.json'):self.assertEqual((self.project/file).read_text(),'User content')
+        for file in ('docs/PROJECT-BRIEF.md','docs/DESIGN-CONTRACT.md','docs/HANDOFF.md'):self.assertEqual((self.project/file).read_text(),'User content')
         self.assertIn('block-testing-strategy',json.loads((self.project/'.ai-toolkit/installed.json').read_text())['skills'])
         self.assertEqual(manager.check(self.project),[])
     def test_dry_run_and_missing_confirmation_do_not_mutate(self):
@@ -119,13 +106,13 @@ class WorkflowTests(unittest.TestCase):
         baseline=self.project/'.ai-toolkit/base/AGENTS.md';baseline.unlink()
         with self.assertRaises(ValueError):manager.plan_change(ROOT,self.project,['block-testing-strategy'])
         self.assertEqual(p.read_text(),'Legacy customized instructions')
-    def test_legacy_install_gets_resume_state_without_resetting_brief(self):
+    def test_missing_handoff_is_added_without_resetting_brief(self):
         self.install();p=self.project/'.ai-toolkit/installed.json';v=json.loads(p.read_text())
-        missing={'.ai-team/state.json','docs/QUALITY-CHECKS.md'}
+        missing={'docs/HANDOFF.md','docs/QUALITY-CHECKS.md'}
         for rel in missing:(self.project/rel).unlink()
-        v['files']=[row for row in v['files'] if row['path'] not in missing];v['schemaVersion']=2;p.write_text(json.dumps(v))
+        v['files']=[row for row in v['files'] if row['path'] not in missing];p.write_text(json.dumps(v))
         (self.project/'docs/PROJECT-BRIEF.md').write_text('Keep this brief')
-        self.run_changes();self.assertTrue(project_tools.resume(self.project)['state']['nextTask'])
+        self.run_changes();self.assertTrue((self.project/'docs/HANDOFF.md').is_file())
         self.assertEqual((self.project/'docs/PROJECT-BRIEF.md').read_text(),'Keep this brief')
     def test_customized_upstream_conflict_leaves_everything_unchanged(self):
         self.copy_toolkit();self.install();(self.project/'.agents/skills/web-foundations/SKILL.md').write_text('My custom skill');before=self.snapshot();self.change_upstream()

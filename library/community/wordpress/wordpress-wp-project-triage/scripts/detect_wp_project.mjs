@@ -6,6 +6,7 @@ const TOOL_VERSION = "0.1.0";
 
 const DEFAULT_IGNORES = new Set([
   ".agents",
+  ".claude",
   ".ai-team",
   ".ai-toolkit",
   ".git",

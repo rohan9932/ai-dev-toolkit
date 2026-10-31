@@ -1,7 +1,6 @@
 # Selecting, updating and recovering project skills
 
-Use `python toolkit.py search <topic> --limit 8` in the toolkit, or the generated project's
-`python .ai-toolkit/tools.py search <topic> --limit 8`. The advanced `scripts/search-catalog.py`
+Use `python toolkit.py search <topic> --limit 8` in the central toolkit checkout. The advanced `scripts/search-catalog.py`
 retains category/status/reference filters. Search loads metadata, never skill bodies or scripts.
 
 ## Existing project changes
@@ -21,9 +20,22 @@ The updater compares current, installed-baseline and incoming hashes. Unchanged 
 can update; customized skills remain when upstream is unchanged. Conflicting upstream/custom
 changes stop the entire preview before writes. Skill-list markers let AGENTS.md keep custom text
 outside that block. Legacy AGENTS.md without a baseline must be unchanged to update automatically.
-Briefs, design contracts, checkpoints and tasks remain project-owned. Unchanged generated role
-instructions and helpers can update; customized versions require a manual merge. Older projects
-receive missing resume state and quality-check instructions without resetting existing work.
+Briefs, design contracts and handoff notes remain project-owned. Unchanged role instructions
+can update; customized versions require a manual merge. To change harnesses, add
+`--harness codex`, `--harness claude` or `--harness goose` to skills update. Only receipt-owned
+skills and adapters are moved; a conflict stops all writes. Switching and migration are reversible.
+
+## Upgrading a v0.3 project
+
+Preview skills update first. Unchanged AGENTS.md and role instructions adopt the simpler workflow.
+Unchanged team.py, tools.py and the full search index are removed. Previous task/state JSON is
+retained as historical data and copied into a new docs/HANDOFF.md if no handoff note exists.
+Review and shorten that migrated note before continuing. Existing handoff notes are preserved.
+
+If an old AGENTS.md was customized, the updater stops rather than leaving obsolete helper
+instructions active. Generate a separate comparison project using the saved project.json, merge
+the current agreements with your custom instructions, and reconcile the baseline/receipt only
+after review. Do not delete a project's task/state notes or custom scripts to force an update.
 
 Applied changes create `.ai-toolkit/history/<transaction>/` with prior bytes and before/after hashes.
 `skills rollback --transaction <id>` selects a particular backup; omitting it selects the latest

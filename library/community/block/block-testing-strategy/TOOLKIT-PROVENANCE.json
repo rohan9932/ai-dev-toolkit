@@ -7,7 +7,8 @@
   "upstreamEntrypointSha256": "ad2e2e86a1d4abe34a4ffac0fc11153ceecb24fefd313a85577ea4a8ebdc7352",
   "localChanges": [
     "Namespaced discovery name",
-    "Replace assumed npm commands with project-specific test discovery"
+    "Replace assumed npm commands with project-specific test discovery",
+    "Replaced generic test-writing advice with stack-specific evidence selection; removed arbitrary coverage and assertion targets"
   ],
   "review": {
     "status": "reviewed",

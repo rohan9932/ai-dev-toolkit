@@ -6,8 +6,6 @@
 /examples/generated/
 __pycache__/
 *.pyc
-.env
-.env.*
 !.env.example
 auth.json
 auth.json.*
@@ -17,3 +15,4 @@ credentials*
 node_modules/
 .next/
 
+config.bat

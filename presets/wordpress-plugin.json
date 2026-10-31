@@ -1,11 +1,9 @@
 {
   "id": "wordpress-plugin",
   "name": "WordPress plugin",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "skills": [
-    "block-code-review",
     "php-development",
-    "project-delivery",
     "wordpress-wp-project-triage",
     "wordpress-wp-plugin-development"
   ],

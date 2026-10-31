@@ -3,6 +3,7 @@ import path from "node:path";
 
 const DEFAULT_IGNORES = new Set([
   ".agents",
+  ".claude",
   ".ai-team",
   ".ai-toolkit",
   ".git",

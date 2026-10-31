@@ -1,7 +1,7 @@
 # Evidence for the current milestone
 
 Choose checks that establish the requested behavior. Record exact commands, results and limits
-in a checkpoint; a test count or a screenshot alone is not proof of a working application.
+in docs/HANDOFF.md; a test count or a screenshot alone is not proof of a working application.
 
 - HTML/CSS: serve the real page; exercise links, forms and keyboard navigation; inspect narrow
   and desktop layouts, long content and focus. Check labels, contrast and reduced motion.

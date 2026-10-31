@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "version": "0.3.0",
+  "version": "0.4.0",
   "skills": [
     {
       "id": "backend-implementation",
@@ -20,7 +20,8 @@
       "compatibility": [
         "codex",
         "goose",
-        "portable"
+        "portable",
+        "claude"
       ],
       "dependencies": [],
       "requires": [],
@@ -29,7 +30,7 @@
         "attribution": "AI Development Toolkit contributors"
       },
       "license": "MIT",
-      "revision": "0.3.0",
+      "revision": "0.4.0",
       "validation": {
         "status": "reviewed",
         "executableReview": "no-executables",
@@ -61,7 +62,8 @@
       "compatibility": [
         "codex",
         "goose",
-        "portable"
+        "portable",
+        "claude"
       ],
       "dependencies": [],
       "requires": [],
@@ -70,7 +72,7 @@
         "attribution": "AI Development Toolkit contributors"
       },
       "license": "MIT",
-      "revision": "0.3.0",
+      "revision": "0.4.0",
       "validation": {
         "status": "reviewed",
         "executableReview": "no-executables",
@@ -100,7 +102,8 @@
       "compatibility": [
         "codex",
         "goose",
-        "portable"
+        "portable",
+        "claude"
       ],
       "dependencies": [],
       "requires": [],
@@ -109,7 +112,7 @@
         "attribution": "AI Development Toolkit contributors"
       },
       "license": "MIT",
-      "revision": "0.3.0",
+      "revision": "0.4.0",
       "validation": {
         "status": "reviewed",
         "executableReview": "no-executables",
@@ -139,7 +142,8 @@
       "compatibility": [
         "codex",
         "goose",
-        "portable"
+        "portable",
+        "claude"
       ],
       "dependencies": [
         "Penpot MCP for live edits"
@@ -150,7 +154,7 @@
         "attribution": "AI Development Toolkit contributors"
       },
       "license": "MIT",
-      "revision": "0.3.0",
+      "revision": "0.4.0",
       "validation": {
         "status": "reviewed",
         "executableReview": "no-executables",
@@ -180,7 +184,8 @@
       "compatibility": [
         "codex",
         "goose",
-        "portable"
+        "portable",
+        "claude"
       ],
       "dependencies": [],
       "requires": [],
@@ -189,7 +194,7 @@
         "attribution": "AI Development Toolkit contributors"
       },
       "license": "MIT",
-      "revision": "0.3.0",
+      "revision": "0.4.0",
       "validation": {
         "status": "reviewed",
         "executableReview": "no-executables",
@@ -207,7 +212,7 @@
     {
       "id": "frontend-implementation",
       "name": "frontend-implementation",
-      "description": "Implement or repair frontend behavior in an existing React or Next.js project, using its installed versions, component conventions and validation commands.",
+      "description": "Implement React or Next.js state, rendering and interaction boundaries while preserving the project's design contract.",
       "path": "library/skills/frontend/frontend-implementation",
       "category": "frontend",
       "technologies": [
@@ -220,7 +225,8 @@
       "compatibility": [
         "codex",
         "goose",
-        "portable"
+        "portable",
+        "claude"
       ],
       "dependencies": [],
       "requires": [],
@@ -229,7 +235,7 @@
         "attribution": "AI Development Toolkit contributors"
       },
       "license": "MIT",
-      "revision": "0.3.0",
+      "revision": "0.4.0",
       "validation": {
         "status": "reviewed",
         "executableReview": "no-executables",
@@ -241,7 +247,7 @@
       ],
       "fileHashes": {
         "LICENSE.txt": "ecc0ddc6de64569c917fa3a650471a6ecbd89be81270818ac2a174317d52020b",
-        "SKILL.md": "5ee0a0cf0490f666f88dd8a95ad7833c8ce4c30851380a9266ca5383e165feeb"
+        "SKILL.md": "545c3a21bbcfd2d3b84040f105b80090336382c4bb67fd08a08c1118735cece8"
       }
     },
     {
@@ -261,7 +267,8 @@
       "compatibility": [
         "codex",
         "goose",
-        "portable"
+        "portable",
+        "claude"
       ],
       "dependencies": [],
       "requires": [],
@@ -270,7 +277,7 @@
         "attribution": "AI Development Toolkit contributors"
       },
       "license": "MIT",
-      "revision": "0.3.0",
+      "revision": "0.4.0",
       "validation": {
         "status": "reviewed",
         "executableReview": "no-executables",
@@ -288,7 +295,7 @@
     {
       "id": "project-delivery",
       "name": "project-delivery",
-      "description": "Coordinate a small project team from requirements through a verified delivery, with explicit task ownership and handoffs.",
+      "description": "Define acceptance criteria and a portable delivery handoff for projects whose requirements or completion evidence are unclear.",
       "path": "library/skills/utilities/project-delivery",
       "category": "utilities",
       "technologies": [
@@ -300,7 +307,8 @@
       "compatibility": [
         "codex",
         "goose",
-        "portable"
+        "portable",
+        "claude"
       ],
       "dependencies": [],
       "requires": [],
@@ -309,7 +317,7 @@
         "attribution": "AI Development Toolkit contributors"
       },
       "license": "MIT",
-      "revision": "0.3.0",
+      "revision": "0.4.0",
       "validation": {
         "status": "reviewed",
         "executableReview": "no-executables",
@@ -321,7 +329,7 @@
       ],
       "fileHashes": {
         "LICENSE.txt": "ecc0ddc6de64569c917fa3a650471a6ecbd89be81270818ac2a174317d52020b",
-        "SKILL.md": "bf754e2e01c3328f12ed89c7b7c7fd4cede66e3d719215758111bf7e3eb9f9b5"
+        "SKILL.md": "3e4c79a99e63ea577997d94fced5280480dc7d24b7066d9eab7113373a536efb"
       }
     },
     {
@@ -720,7 +728,7 @@
       "fileHashes": {
         "SKILL.md": "eb7bb8f7634313c6da70f711965cc89f54ab51dcc207daa8cc942a4c883c89f8",
         "TOOLKIT-GPL-2.0.txt": "edaef632cbb643e4e7a221717a6c441a4c1a7c918e6e4d56debc3d8739b233f6",
-        "TOOLKIT-PROVENANCE.json": "4852981aafe02af6e473f661b73f5a6fd62ef7b2577dee22cc5073c664470a7d",
+        "TOOLKIT-PROVENANCE.json": "2141e1791bb97ec6bec16996a68795e2c1dd1274c4dc264071bd1fa1b782bbf6",
         "TOOLKIT-UPSTREAM-LICENSE.txt": "c459163edc9603ee54f98f42e252a76c03287c9eedd80329a2af732562c39094",
         "references/creating-new-block-theme.md": "80da1daf0c19fe0bc74b0742dcf52ab957fcbe1f27cb189ce2b22c9642b0daf2",
         "references/debugging.md": "5cfba5d3db9642ddf20d0bddf8281621389c2e2a3e06d11884095d0c2f0c84be",
@@ -728,7 +736,7 @@
         "references/style-variations.md": "dee9e43a0086894d08d5dea2fb97c147a32b6eb467cbcb16c3efed4722f5dae8",
         "references/templates-and-parts.md": "e8bf7931d0b7533eab2508065ab5b7d5678788ab8ffee06acfcfd07b893fc32d",
         "references/theme-json.md": "5372eca3499435f457b4175cf43234e02ec7c34c054266bb746e35ee935316cb",
-        "scripts/detect_block_themes.mjs": "eacc5d86dda3d18a3c1b04da0f3788ccd1d0cd23aa88c48097de494f2bd3548e"
+        "scripts/detect_block_themes.mjs": "64980e2e6afd206995270a8acd30c9ed150d3d2379af5edebbec8b64c9d71601"
       }
     },
     {
@@ -1129,7 +1137,7 @@
       "fileHashes": {
         "SKILL.md": "fec1f1209239e13af491e97dfc056140d3f0b8c1e5b2726581c64ca133309c63",
         "TOOLKIT-GPL-2.0.txt": "edaef632cbb643e4e7a221717a6c441a4c1a7c918e6e4d56debc3d8739b233f6",
-        "TOOLKIT-PROVENANCE.json": "60bbe05c0bd5aa38b42601927906fcc80d7ccde70007ff5f6f71beca4837c6fd",
+        "TOOLKIT-PROVENANCE.json": "6031208cfa2802b9031adc5aff5a67ecad70862607867385b5ceeea3d8cc7e5c",
         "TOOLKIT-UPSTREAM-LICENSE.txt": "c459163edc9603ee54f98f42e252a76c03287c9eedd80329a2af732562c39094",
         "references/data-and-cron.md": "44680a54d5631e29bbc2112216804934c31ec2ceb8c66dc57eff8bac941631ff",
         "references/debugging.md": "7e88d7648b9140ebef2d30ea0217c518cb096f42350b0d69fc5a29375d895777",
@@ -1137,7 +1145,7 @@
         "references/security.md": "b47db8f8a23be660efb7f46eadef9cd90864a79388f3eaa7e4ca0b99e504f170",
         "references/settings-api.md": "e9e2dbe2231b18a08df23e065b3a63f71120fa9e0005120b3df93a8fdf3216a2",
         "references/structure.md": "7fe9b0dffb290328ca3c808c5051ade4ffcb81031c6849c3d03e5dffd3330e55",
-        "scripts/detect_plugins.mjs": "0cfd26b2402614fd8cb447c4989abe59190da8a1446a4686381dda6451132240"
+        "scripts/detect_plugins.mjs": "a26024e4c17c6abcc8ba21608c84d90aabb0346197f8f26ee363f78f553b6188"
       }
     },
     {
@@ -1242,10 +1250,10 @@
       "fileHashes": {
         "SKILL.md": "3ef4d049a09cbeefcf263fb3cc3f038f56bc81e361b780b3e3be25e3d670d9eb",
         "TOOLKIT-GPL-2.0.txt": "edaef632cbb643e4e7a221717a6c441a4c1a7c918e6e4d56debc3d8739b233f6",
-        "TOOLKIT-PROVENANCE.json": "89e2fe1f48e4a70c1aa711087305aabd248a30094f616d3b7cbe36f6cc0f7399",
+        "TOOLKIT-PROVENANCE.json": "c6a75a088007d4b08b052158c3dbde14b8d36d61f974d22117021c67dee4cec1",
         "TOOLKIT-UPSTREAM-LICENSE.txt": "c459163edc9603ee54f98f42e252a76c03287c9eedd80329a2af732562c39094",
         "references/triage.schema.json": "da429e21987f04c0fac71a2fcc1f279773a9ef3e413a533938246421ce0da812",
-        "scripts/detect_wp_project.mjs": "68cd078e36e828f5a60827ca37951d3d2f49bb92f36a409e86f5839cf7df7dd7"
+        "scripts/detect_wp_project.mjs": "dea0d59b3a5d90e6a80700e7ff37a517a4911f2ad5f41d7389990f27694d4599"
       }
     },
     {
@@ -3595,8 +3603,8 @@
         "TOOLKIT-UPSTREAM-LICENSE.txt"
       ],
       "fileHashes": {
-        "SKILL.md": "0b1e0385ea75bfcbaf7c8da1ccb03bdce4dfd02880c43adef04bee97e582d8a0",
-        "TOOLKIT-PROVENANCE.json": "49e2b9fcbb37d7574b9b621289641a402c5a850572bedcc741e35f63f8345106",
+        "SKILL.md": "8cc22cbd58152079c5e37304e2984fb0310794674a862f317bd2ee074cd171fc",
+        "TOOLKIT-PROVENANCE.json": "7f70964a7f97c7c11b99a5198010bac18c60d36bdfc3f8ebe5bc5e4ad074ef7e",
         "TOOLKIT-UPSTREAM-LICENSE.txt": "998dffd7be3657b8ba872cce9dc56b1b382d647e27c890498cc81f3408400194"
       }
     },
@@ -45102,7 +45110,8 @@
         "software"
       ],
       "compatibility": [
-        "portable-markdown"
+        "portable-markdown",
+        "claude"
       ],
       "dependencies": [
         "The selected database driver/runtime must be available for integration tests"
@@ -45113,7 +45122,7 @@
         "attribution": "AI Development Toolkit contributors"
       },
       "license": "MIT",
-      "revision": "0.3.0",
+      "revision": "0.4.0",
       "validation": {
         "status": "reviewed",
         "executableReview": "no-executables",
@@ -45126,7 +45135,7 @@
       ],
       "fileHashes": {
         "LICENSE": "ecc0ddc6de64569c917fa3a650471a6ecbd89be81270818ac2a174317d52020b",
-        "SKILL.md": "68046a35248c664b896f723e07957c5ee3dcf0bc360d4e9e73de6f3aedb7cc9a",
+        "SKILL.md": "61cd5713b8c4af2b501a0b889ac6cbc5ac9e3bafd8d5dcc8e4536e40aede4d5f",
         "references/databases.md": "c443eb8cefe1cf6e73922ed0a5946a94e668efc054afe13bcd3fc7830857033c"
       }
     }

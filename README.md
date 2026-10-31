@@ -1,19 +1,8 @@
 # Universal AI Development Toolkit
 
-Keep one central skill library. Describe a project to your coding AI. It helps you choose a stack
-and design, creates a separate project folder, and works through Planner, Designer, Builder and
-Reviewer roles. Small changes can use fewer stages; hosts without delegation use sequential roles.
-
-## What belongs here
-
-Use this repository with an existing coding-agent harness. The harness reads and edits files,
-searches code, runs commands, calls available tools and enforces permissions. The toolkit supplies
-project instructions, design expertise, framework/database guidance, verification criteria and
-small-team handoffs. Its helpers manage project resources and state; they are not a replacement harness.
-
-Basic-operation wrappers are excluded. Specialist skills such as WordPress development, design
-systems and database optimization remain useful because they guide decisions beyond tool execution.
-The original discovery index is historical audit data, not the installable or recommended skill list.
+A portable project starter and specialist skills library for Codex, Claude Code and Goose.
+Your harness handles editing, commands, planning, sessions and delegation. This toolkit adds
+design direction, stack-specific knowledge and a small set of project agreements.
 
 ## Clone, open, talk
 
@@ -22,95 +11,74 @@ git clone https://github.com/creativekamrul/ai-dev-toolkit.git
 cd ai-dev-toolkit
 ```
 
-Open this folder in your coding agent and say:
+Open the folder in your coding harness and say:
 
-> Read START-HERE.md. Create a project called Olive. Help me choose the stack and design,
-> put it in a separate project folder, and start the first useful milestone.
+> Read START-HERE.md. Create a funky WordPress portfolio in ../my-portfolio.
+> Help me with any missing choices, then start the first useful milestone.
 
-The AI asks only for missing choices, previews the setup, and creates the project elsewhere.
-Python 3.10+ is the only toolkit requirement. No global skill installation, API key or separate
-AI service is needed. Your coding agent provides AI execution and builds the application.
+The AI asks only for missing choices, recommends relevant skills, previews setup and creates
+the project outside the toolkit. If the host cannot switch workspace, open the new folder and say:
 
-When continuing in the new folder, say:
+> Read AGENTS.md and docs/HANDOFF.md. Continue the next milestone.
 
-> Read AGENTS.md, run the project resume helper, and continue the next milestone.
+Python 3.10+ is the only setup-helper requirement. No global skill installation, toolkit service
+or API key is needed. The harness must already be configured. Application runtimes depend on
+your chosen stack. Normal development in a generated project does not require toolkit scripts.
 
-[START-HERE.md](START-HERE.md) contains the complete agent-facing flow. If your host cannot switch
-workspaces, open the new project folder when instructed. Skill files do not launch agents by themselves.
+## What you choose
 
-## Your choices stay independent
+- **18 stacks:** HTML/CSS/JavaScript, PHP, Laravel, WordPress site/plugin/theme/headless,
+  Next.js, React/Vite, MERN, Express, NestJS, SaaS, landing page, API service, n8n, Python or custom.
+- **9 design directions:** business, funky, glassmorphism, minimal, editorial, brutalist,
+  match existing, custom references or no UI.
+- **Harness:** Codex, Claude Code or Goose. Selected skills use the host's native directory.
+- **Team:** Planner, Designer, Builder and Reviewer using native delegation, or sequential solo roles.
 
-**18 stack presets:** HTML/CSS/JavaScript, PHP, Laravel, WordPress site/plugin/theme/headless,
-Next.js, React/Vite, MERN, Express, NestJS, SaaS, landing page, API service, n8n, Python and custom.
+The Designer turns the chosen direction into concrete tokens, states and a representative preview.
+Framework and database skills guide implementation; stack-specific quality checks define evidence.
+Role briefs guide native agents and do not launch a separate runtime.
 
-**9 design directions:** business, funky, glassmorphism, minimal, editorial, brutalist,
-match existing, custom references and no UI. The Designer records concrete tokens and states,
-prepares a representative preview, and checks narrow/desktop rendering before expanding the UI.
+## What travels with each project
 
-Database selections now add a reviewed database workflow. Optional testing capability adds a
-reviewed test strategy. Explicit routing rules explain selections and reject known stack/style
-mismatches. Arbitrary imported skills still need task-specific compatibility review.
+Only selected specialist packages, plus a project brief, design contract, short handoff note,
+quality criteria and role briefs. AGENTS.md holds shared agreements. Claude Code additionally
+gets CLAUDE.md importing AGENTS.md and skills in .claude/skills; Codex and Goose use .agents/skills.
+Goose also gets a short .goosehints adapter. No custom task database, checkpoint service or doctor.
 
-## Included and portable
+The central passive library contains **776 packages**: 635 local snapshots, 132 community imports
+and 9 toolkit skills. **14 are reviewed; 762 are screened optional packages.** Supporting files,
+licenses and provenance travel with installed packages. Generic delivery and code-review checklists remain
+optional and are no longer installed by every preset. The library is not loaded wholesale.
 
-**776 actual packages:** 635 reusable local snapshots, 132 community imports and 9 toolkit skills,
-with supporting files, licenses and provenance. Of these, 14 are reviewed; 762 are screened optional
-packages. Project-specific/restricted material and private inventories remain excluded.
+Screened imports may have original-host dependencies; compatibility needs task-specific review.
+The historical discovery index is audit data, not the recommended installation list.
 
-Only selected packages are copied into each project's `.agents/skills/`. A compact catalog lists
-installed skills and why they were selected. A separate offline search index returns a short list;
-the AI does not need to load the whole library. Some optional skills require their original tools.
-
-The generated project also receives its brief, design contract, quality checks, team roles,
-task ledger, checkpoint/resume helper and hashed installation receipt.
-
-## Optional commands (the AI can run these for you)
+## Optional commands â€” the AI can run them
 
 ```bash
-# Remember a projects directory privately in this checkout:
+python toolkit.py new --name olive --preset php --style glassmorphism --database sqlite --harness claude --noninteractive --dry-run
+python toolkit.py search "php escaping" --limit 5
 python toolkit.py preferences --projects-root ../projects
-
-# Preview an agreed project:
-python toolkit.py new --name olive --preset php --style glassmorphism --database sqlite --capabilities testing --noninteractive --dry-run
-
-# Inspect choices and tools:
-python toolkit.py recommend --preset php --style glassmorphism --database sqlite
-python toolkit.py doctor --project ../projects/olive
-
-# Inside the generated project:
-python .ai-toolkit/tools.py search "php escaping" --limit 5
-python .ai-toolkit/tools.py resume
-```
-
-Use `--yes` instead of `--dry-run` to install the agreed setup. No project can be created inside
-the toolkit checkout. Conflicts stop creation before writes. Preferences and original-machine
-paths are not committed; choose a projects directory again on another computer if needed.
-
-## Safe changes as projects grow
-
-From the central checkout:
-
-```bash
 python toolkit.py skills add --project ../projects/olive --skill block-testing-strategy --dry-run
-python toolkit.py skills update --project ../projects/olive --dry-run
+python toolkit.py skills update --project ../projects/olive --harness goose --dry-run
 python toolkit.py skills check --project ../projects/olive
 python toolkit.py skills rollback --project ../projects/olive --dry-run
 ```
 
-Apply with `--yes`. Updates preserve working briefs, designs and checkpoints. Conflicting edits
-stop the update; local skill edits survive when upstream is unchanged. Managed skill-list updates
-preserve surrounding AGENTS.md instructions. Every applied change has a restorable local backup.
-Rollback refuses to overwrite edits made afterward. See [maintenance](docs/MAINTENANCE.md).
+Replace --dry-run with --yes to apply the agreed change. Updates preserve project documents,
+stop on conflicting skill edits and save reversible backups. Switching harnesses moves managed
+skills into the appropriate native directory; local customizations are never silently discarded.
+Machine-specific preferences stay in ignored .local/. See [maintenance](docs/MAINTENANCE.md).
 
-## Verification and documentation
+## Details and validation
 
-[Validation results](PROGRESS.md) · [Outcome evaluation](evaluation/README.md) ·
-[Catalog](docs/CATALOG.md) · [Team](docs/TEAM.md) · [Architecture](docs/ARCHITECTURE.md) ·
-[Compatibility](docs/COMPATIBILITY.md) · [Licensing](docs/SECURITY-AND-LICENSING.md)
+[Start here](START-HERE.md) Â· [Compatibility and sources](docs/COMPATIBILITY.md) Â·
+[Team](docs/TEAM.md) Â· [Architecture](docs/ARCHITECTURE.md) Â· [Catalog](docs/CATALOG.md) Â·
+[Validation results](PROGRESS.md) Â· [Outcome evaluation](evaluation/README.md)
 
-Development checks: install `requirements-dev.txt`, run `python scripts/validate.py`, then
-`python -m unittest discover -s tests -v`. Optional browser/application fixtures are separate
-from normal project setup. CI checks Windows/Ubuntu helpers and representative application outcomes.
+Maintenance checks: install requirements-dev.txt, run `python scripts/validate.py`, then
+`python -m unittest discover -s tests -v`. CI covers Windows/Ubuntu behavior and application fixtures.
+See compatibility evidence for the difference between adapter layout tests and native runtime checks.
 
-Original toolkit code is MIT licensed. Third-party packages retain their own licenses; the
-WordPress evaluation plugin is GPL-2.0-or-later. See package notices and THIRD-PARTY-NOTICES.md.
+Original toolkit code is MIT licensed. Imported packages retain their own licenses; see
+THIRD-PARTY-NOTICES.md and package provenance. The WordPress evaluation plugin is GPL-2.0-or-later.

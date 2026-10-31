@@ -2,6 +2,7 @@
 import hashlib,importlib.util,json,os,uuid
 from datetime import datetime,timezone
 from pathlib import Path
+from adapters import SKILL_PREFIXES
 
 spec=importlib.util.spec_from_file_location('project_initializer',Path(__file__).with_name('init-project.py'))
 init=importlib.util.module_from_spec(spec);spec.loader.exec_module(init)
@@ -22,7 +23,7 @@ def block(text):
     return left,right,text[left:right]
 
 
-def plan_change(root,project,extras=(),allow_screened=False):
+def plan_change(root,project,extras=(),allow_screened=False,harness=None):
     root=root.resolve();project=init.no_links(project)
     config=read(init.safe_path(project,'.ai-toolkit/project.json'))
     receipt=read(init.safe_path(project,'.ai-toolkit/installed.json'))
@@ -31,17 +32,26 @@ def plan_change(root,project,extras=(),allow_screened=False):
     for rel in old:init.safe_path(project,rel)
     config['add_skills']=sorted(set(config.get('add_skills',[]))|set(extras))
     config['allow_screened']=config.get('allow_screened',False) or allow_screened
+    config['harness']=harness or config.get('harness','codex')
     desired,selected=init.build_plan(root,project,config['preset'],config['style'],config['team'],config['brief'],config['audience'],
-        config['database'],config.get('integrations',[]),config['add_skills'],config.get('remove_skills',[]),config['allow_screened'],config.get('capabilities',[]))
-    managed={p for p in desired if p.startswith('.agents/skills/')}
-    managed|={p for p in old if p.startswith('.agents/skills/')}
+        config['database'],config.get('integrations',[]),config['add_skills'],config.get('remove_skills',[]),config['allow_screened'],config.get('capabilities',[]),config['harness'])
+    managed={p for p in desired if p.startswith(SKILL_PREFIXES)}
+    managed|={p for p in old if p.startswith(SKILL_PREFIXES)}
+    managed|={p for p in ('CLAUDE.md','.goosehints') if p in desired or p in old}
     managed|={'AGENTS.md','.ai-toolkit/base/AGENTS.md','.ai-toolkit/catalog.json','.ai-toolkit/search-index.json',
               '.ai-toolkit/project.json','.ai-toolkit/tools.py','.ai-toolkit/REVIEW-REQUIRED.md',
               '.ai-team/team.py','.ai-team/TEAM.md'}
     managed|={p for p in desired if p.startswith('.ai-team/roles/')}
-    # Older installations gain missing workflow resources without resetting project work.
-    for rel in ('.ai-team/state.json','docs/QUALITY-CHECKS.md'):
+    # Project-owned documents and old task/state records are never overwritten or deleted.
+    for rel in ('docs/HANDOFF.md','docs/QUALITY-CHECKS.md'):
         if rel not in old and not init.safe_path(project,rel).exists():managed.add(rel)
+    if 'docs/HANDOFF.md' in managed:
+        history=[]
+        for rel in ('.ai-team/state.json','.ai-team/tasks.json'):
+            path=init.safe_path(project,rel)
+            if path.is_file():history.append('## Previous '+rel+'\n\n```json\n'+json.dumps(read(path),indent=2)+'\n```\n')
+        if history:
+            desired['docs/HANDOFF.md']['data']=('# Project handoff\n\nMigrated notes below are historical claims. Verify current files before continuing.\n\n'+'\n'.join(history)).encode('utf-8')
     changes=[];conflicts=[];preserved=[]
     # Preserve project instructions outside the managed skill block. Legacy installations
     # without a baseline can only update an entirely unchanged AGENTS.md.
@@ -52,7 +62,10 @@ def plan_change(root,project,extras=(),allow_screened=False):
             a=agents.decode('utf-8');b=baseline.decode('utf-8');n=desired['AGENTS.md']['data'].decode('utf-8')
             left,right,section=block(a)
             if section!=block(b)[2]:raise ValueError('Customized managed skill block')
-            desired['AGENTS.md']['data']=(a[:left]+block(n)[2]+a[right:]).encode('utf-8')
+            if a!=b:
+                if receipt.get('schemaVersion',0)<4:
+                    raise ValueError('Legacy instructions need manual migration')
+                desired['AGENTS.md']['data']=(a[:left]+block(n)[2]+a[right:]).encode('utf-8')
         except (ValueError,UnicodeError):conflicts.append('AGENTS.md (managed skills block needs a manual merge)')
     for rel in sorted(managed):
         path=init.safe_path(project,rel);before=current(path);after=desired.get(rel,{}).get('data')
@@ -66,7 +79,8 @@ def plan_change(root,project,extras=(),allow_screened=False):
             conflicts.append(rel);continue
         if before is not None or after is not None:changes.append({'path':rel,'before':before,'after':after})
     if conflicts:raise ValueError('Conflicts; no files changed: '+', '.join(conflicts))
-    new_receipt=dict(receipt,toolkitVersion=read(root/'manifests/catalog.json')['version'],skills=selected,schemaVersion=3)
+    new_receipt=dict(receipt,toolkitVersion=read(root/'manifests/catalog.json')['version'],skills=selected,harness=config['harness'],schemaVersion=4,
+                     adaptations=json.loads(desired['.ai-toolkit/installed.json']['data'])['adaptations'])
     hashes=dict(old)
     for change in changes:
         if change['after'] is None:hashes.pop(change['path'],None)
@@ -163,7 +177,7 @@ def rollback(project,transaction=None,yes=False,dry_run=False):
 def check(project):
     project=init.no_links(project);receipt=read(init.safe_path(project,'.ai-toolkit/installed.json'));result=[]
     for row in receipt['files']:
-        if not row['path'].startswith('.agents/skills/'):continue
+        if not row['path'].startswith(SKILL_PREFIXES):continue
         data=current(init.safe_path(project,row['path']))
         if data is None or digest(data)!=row['sha256']:
             result.append({'path':row['path'],'status':'missing' if data is None else 'customized'})

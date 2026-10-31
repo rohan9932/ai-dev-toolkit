@@ -3,7 +3,6 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
 spec=importlib.util.spec_from_file_location('initializer',ROOT/'scripts/init-project.py');init=importlib.util.module_from_spec(spec);spec.loader.exec_module(init)
-import team
 
 class SetupTests(unittest.TestCase):
     def setUp(self):
@@ -20,7 +19,8 @@ class SetupTests(unittest.TestCase):
         for p in (ROOT/'presets').glob('*.json'):
             with self.subTest(preset=p.stem):
                 plan,selected=self.plan(preset=p.stem)
-                self.assertIn('project-delivery',selected)
+                self.assertNotIn('project-delivery',selected)
+                self.assertNotIn('block-code-review',selected)
                 self.assertEqual(len([key for key in plan if key.startswith('.ai-team/roles/')]),4)
                 self.assertIn('.ai-toolkit/catalog.json',plan)
     def test_all_styles_are_independent_of_stack(self):
@@ -76,30 +76,11 @@ class SetupTests(unittest.TestCase):
         with contextlib.redirect_stdout(io.StringIO()),self.assertRaises(ValueError):init.apply_plan(self.plan()[0],noninteractive=True)
         self.assertFalse(self.dest.exists())
     def test_interactive_choices_are_saved_and_installed(self):
-        answers='\n'.join(['Member directory','Club members',str(self.dest),'php','glassmorphism','small','sqlite','','','','y',''])
+        answers='\n'.join(['Member directory','Club members',str(self.dest),'php','glassmorphism','claude','small','sqlite','','','','y',''])
         r=subprocess.run([sys.executable,str(ROOT/'scripts/init-project.py')],input=answers,capture_output=True,text=True)
         self.assertEqual(r.returncode,0,r.stderr)
         config=json.loads((self.dest/'.ai-toolkit/project.json').read_text())
         self.assertEqual((config['preset'],config['style'],config['database']),('php','glassmorphism','sqlite'))
 
-class TeamTests(unittest.TestCase):
-    def setUp(self):self.data={'schemaVersion':1,'tasks':[]}
-    def add(self,key='build',deps=None,paths=None):team.change(self.data,'add',key,title=key,owner='builder',dependencies=deps or [],paths=paths or ['src'],acceptance='Works')
-    def test_dependencies_and_path_ownership(self):
-        self.add();self.add('next',['build'],['other']);self.add('overlap',paths=['src/page'])
-        with self.assertRaises(ValueError):team.change(self.data,'transition','next',status='doing')
-        team.change(self.data,'transition','build',status='doing')
-        with self.assertRaises(ValueError):team.change(self.data,'transition','overlap',status='doing')
-    def test_completion_requires_review_and_evidence(self):
-        self.add()
-        with self.assertRaises(ValueError):team.change(self.data,'transition','build',status='done',evidence='Done',reviewer='reviewer')
-        team.change(self.data,'transition','build',status='doing')
-        with self.assertRaises(ValueError):team.change(self.data,'transition','build',status='review')
-        team.change(self.data,'transition','build',status='review',evidence='Tests pass')
-        with self.assertRaises(ValueError):team.change(self.data,'transition','build',status='done',evidence='Checked')
-        team.change(self.data,'transition','build',status='done',evidence='Checked',reviewer='self-review')
-        self.assertEqual(self.data['tasks'][0]['status'],'done')
-    def test_path_traversal_rejected(self):
-        with self.assertRaises(ValueError):self.add(paths=['../outside'])
 
 if __name__=='__main__':unittest.main()

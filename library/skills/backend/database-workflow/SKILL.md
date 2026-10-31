@@ -25,4 +25,4 @@ including upgrading an existing schema; do not silently reset a real database to
 Test the useful behavior: constraints reject invalid data, transactions preserve invariants,
 unauthorized users cannot cross ownership boundaries, and important queries use suitable plans.
 Report which engine and environment were tested. A mocked repository test does not establish
-real database behavior. Record schema decisions and remaining migration work in the project checkpoint.
+real database behavior. Record schema decisions and remaining migration work in the project handoff note.

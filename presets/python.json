@@ -1,11 +1,9 @@
 {
   "id": "python",
   "name": "Python backend / automation",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "skills": [
-    "backend-implementation",
-    "block-code-review",
-    "project-delivery"
+    "backend-implementation"
   ],
   "instructions": "library/instructions/python.md",
   "technologies": [
