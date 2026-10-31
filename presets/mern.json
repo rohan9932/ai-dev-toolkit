@@ -1,12 +1,10 @@
 {
   "id": "mern",
   "name": "MERN: MongoDB + Express + React + Node",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "skills": [
     "backend-implementation",
-    "block-code-review",
-    "frontend-implementation",
-    "project-delivery"
+    "frontend-implementation"
   ],
   "instructions": "library/instructions/mern.md",
   "technologies": [

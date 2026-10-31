@@ -1,11 +1,9 @@
 {
   "id": "api-service",
   "name": "API service (choose runtime in brief)",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "skills": [
-    "backend-implementation",
-    "block-code-review",
-    "project-delivery"
+    "backend-implementation"
   ],
   "instructions": "library/instructions/api-service.md",
   "technologies": [

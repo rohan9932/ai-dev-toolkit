@@ -19,8 +19,9 @@ class DetectorTests(unittest.TestCase):
     def test_plugin_detection_ignores_installed_skill_examples(self):
         source='<?php\n/**\n * Plugin Name: Test Registration\n * Version: 1.0.0\n */\n'
         (self.project/'plugin.php').write_text(source)
-        nested=self.project/'.agents/skills/example';nested.mkdir(parents=True)
-        (nested/'example.php').write_text(source.replace('Test Registration','Example to ignore'))
+        for directory in ('.agents','.claude'):
+            nested=self.project/directory/'skills/example';nested.mkdir(parents=True)
+            (nested/'example.php').write_text(source.replace('Test Registration','Example to ignore'))
         report=self.run_detector('wp-plugin-development','detect_plugins.mjs')
         self.assertEqual(report['count'],1);self.assertEqual(report['plugins'][0]['name'],'Test Registration')
         report=self.run_detector('wp-project-triage','detect_wp_project.mjs')
@@ -34,6 +35,10 @@ class DetectorTests(unittest.TestCase):
         (self.project/'theme.json').write_text('{"version":3}')
         (self.project/'templates').mkdir();(self.project/'templates/index.html').write_text('<!-- wp:post-content /-->')
         (self.project/'style.css').write_text('/*\nTheme Name: Test Theme\n*/')
+        for directory in ('.agents','.claude'):
+            nested=self.project/directory/'skills/example-theme';nested.mkdir(parents=True)
+            (nested/'style.css').write_text('/*\nTheme Name: Example to ignore\n*/')
+            (nested/'theme.json').write_text('{"version":3}')
         report=self.run_detector('wp-block-themes','detect_block_themes.mjs')
         self.assertEqual(report['count'],1);self.assertTrue(report['themes'][0]['isBlockTheme'])
         report=self.run_detector('wp-project-triage','detect_wp_project.mjs')

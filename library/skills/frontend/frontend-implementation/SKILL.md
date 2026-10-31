@@ -1,27 +1,18 @@
 ---
 name: frontend-implementation
-description: "Implement or repair frontend behavior in an existing React or Next.js project, using its installed versions, component conventions and validation commands."
+description: "Implement React or Next.js state, rendering and interaction boundaries while preserving the project's design contract."
 ---
 
-# Frontend implementation
+# React and Next.js decisions
 
-Read the package manifest, lockfile, route structure and nearby components before editing.
-Find the existing component library and shared data/state conventions. Reuse them and keep the
-scope tied to the requested behavior. Use the project's installed framework version when
-consulting official documentation; do not assume the newest API or add a framework by default.
+Match the installed router and framework version. In Next.js, keep privileged data access on
+the server and place client boundaries where browser APIs or interaction require them.
+Make cache invalidation and post-mutation UI updates explicit for the route being changed.
 
-Trace user input through state, data access and rendering. Keep secrets and privileged logic
-on the server. In Next.js, inspect the router in use and place client boundaries only where
-browser APIs or interaction require them. Make loading, retry and failure states usable.
+Trace user input through state, data access and rendering. Avoid duplicating derived state or
+adding a state library for a local interaction. Keep loading, retry and error states usable.
+Preserve focus after dialogs, navigation and validation; use semantic interactive elements.
 
-Use semantic elements and typed component contracts. Preserve existing keyboard behavior and
-focus after dialogs, navigation and validation. Avoid introducing state libraries for a local
-interaction, duplicating derived state, or coupling unrelated page logic into a shared component.
-
-For visual decisions follow the project's chosen design standards; this workflow does not
-prescribe an aesthetic. Verify the changed behavior with the project's available build, lint,
-type-check and relevant tests. Read script definitions before running them. Do not invent a
-successful command or install tooling merely because a common script is missing.
-
-Report the implemented behavior, checks performed and any setup or integration still required.
-
+Follow the selected design contract and existing component library. Validate affected route
+rendering and interactions in addition to build/type checks; server/client mistakes can survive
+a static visual review. This skill supplies no default aesthetic.

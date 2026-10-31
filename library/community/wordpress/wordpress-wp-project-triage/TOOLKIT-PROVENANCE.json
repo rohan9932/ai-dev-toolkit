@@ -9,7 +9,8 @@
     "Namespaced discovery name",
     "Adapted SKILL.md paths to installed WordPress skill locations",
     "Exclude .agents, .ai-team and .ai-toolkit from detectors",
-    "Allow null optional paths in schema to match detector output"
+    "Allow null optional paths in schema to match detector output",
+    "Exclude .claude from read-only detectors so installed skill examples are not application code"
   ],
   "review": {
     "status": "reviewed",

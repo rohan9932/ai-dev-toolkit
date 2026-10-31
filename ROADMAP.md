@@ -15,8 +15,9 @@
 
 - [ ] Review optional skill scripts and host-specific references as real projects need them.
 - [ ] Add useful resources when redistribution terms become available; never guess a license.
-- [ ] Add upstream comparison and update previews that preserve project customizations.
-- [ ] Test Goose runtime discovery and other host adapters.
+- [x] Add upstream comparison and update previews that preserve project customizations.
+- [x] Test Goose native discovery and Codex/Claude Code/Goose adapter layouts.
+- [ ] Verify Claude Code native loading on a machine with Claude Code installed.
 - [x] Independently forward-test HTML/PHP projects and run authored Next.js/WordPress outcome fixtures.
 - [ ] Expand independent model evaluations to other stacks/styles and more complex applications.
 
@@ -31,3 +32,12 @@ Keep the team small. Add capabilities through skills rather than creating a depa
 - [x] Checkpoints/resume and clearer task-state transitions.
 - [x] Skill add/check/update, customization protection, recoverable transactions and rollback.
 - [x] Cross-platform behavior tests and repeatable browser/application evaluation fixtures.
+
+## Delivered in v0.4
+
+- [x] Removed custom task/checkpoint/runtime-check machinery from the normal workflow.
+- [x] Focused specialist defaults, with generic delivery/review optional.
+- [x] Native harness adapters and reversible harness switching.
+- [x] Portable brief, design and handoff documents; host-managed plans and delegation.
+- [x] Safe legacy migration with preserved notes and explicit customization conflicts.
+- [x] All stack/style/harness setup combinations and native Codex/Goose discovery checked.

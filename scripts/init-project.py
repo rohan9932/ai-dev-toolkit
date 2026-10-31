@@ -7,6 +7,7 @@ from pathlib import Path
 import re
 import sys
 from routing import recommendations,validate_selection
+from adapters import HARNESSES,adapter,instruction_files,relocate_markdown
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -45,8 +46,9 @@ def choose(label,options,default=None):
 def split_ids(value):
     return value if isinstance(value,list) else [v.strip() for v in (value or '').split(',') if v.strip()]
 
-def build_plan(root,destination,preset_id,style_id,team,brief,audience,database,integrations,extras,removed,allow_screened=False,capabilities=None):
+def build_plan(root,destination,preset_id,style_id,team,brief,audience,database,integrations,extras,removed,allow_screened=False,capabilities=None,harness='codex'):
     root=root.resolve(); destination=no_links(destination)
+    host=adapter(harness)
     if destination.exists() and not destination.is_dir(): raise ValueError('Destination must be a directory')
     if destination.is_relative_to(root): raise ValueError('Choose a project directory outside the entire toolkit checkout.')
     catalog=read_json(root/'manifests/catalog.json'); entries={s['id']:s for s in catalog['skills']}
@@ -65,7 +67,6 @@ def build_plan(root,destination,preset_id,style_id,team,brief,audience,database,
     selected.update(options['databases'][database]['skills'])
     for integration in integrations: selected.update(options['integrations'][integration]['skills'])
     selected-=set(removed)
-    if 'project-delivery' not in selected: raise ValueError('project-delivery is required for team handoffs')
     pending=list(selected)
     while pending:
         sid=pending.pop()
@@ -73,7 +74,7 @@ def build_plan(root,destination,preset_id,style_id,team,brief,audience,database,
         for dep in entries[sid].get('requires',[]):
             if dep in removed: raise ValueError(f'{sid} requires removed skill {dep}')
             if dep not in selected: selected.add(dep); pending.append(dep)
-    selected=sorted(selected); plan={}
+    selected=sorted(selected); plan={};adaptations=[]
     policy=validate_selection(root,selected,preset_id,style_id,database,capabilities)
     targets=set()
     def add(relative,data):
@@ -91,13 +92,17 @@ def build_plan(root,destination,preset_id,style_id,team,brief,audience,database,
         for filename in entry['files']:
             source=safe_path(root,entry['path']+'/'+filename); data=source.read_bytes()
             if digest(data)!=entry['fileHashes'].get(filename): raise ValueError('Source hash mismatch: '+str(source.relative_to(root)))
-            add('.agents/skills/'+entry['name']+'/'+filename,data)
+            original=data;data=relocate_markdown(data,filename,harness,[entries[s]['name'] for s in selected])
+            if data!=original:
+                adaptations.append({'path':host['skills']+'/'+entry['name']+'/'+filename,
+                    'kind':'native-skill-paths','sourceSha256':digest(original)})
+            add(host['skills']+'/'+entry['name']+'/'+filename,data)
     stack_instructions=safe_path(root,preset['instructions']).read_text(encoding='utf-8')
     design_instructions=safe_path(root,style['instructions']).read_text(encoding='utf-8')
     skill_lines='\n'.join(f"- `{sid}`: {entries[sid]['description']}" for sid in selected)
     add('AGENTS.md',f'''# Project working agreements
 
-Read `docs/PROJECT-BRIEF.md`, `docs/DESIGN-CONTRACT.md` and `.ai-team/TEAM.md` before work.
+Read `docs/PROJECT-BRIEF.md`, `docs/DESIGN-CONTRACT.md`, `docs/HANDOFF.md` and `.ai-team/TEAM.md`.
 The agent harness provides execution. Use its native file editing, search, commands, connected
 tools and delegation where available. These project resources add domain guidance and quality
 criteria; they do not replace the harness or require alternative tools for basic operations.
@@ -107,7 +112,7 @@ React or a restrained business look. Preserve the selected stack and existing pr
 
 The Planner coordinates scope and handoffs, the Designer owns the design contract, the Builder
 implements, and the Reviewer checks evidence. Follow ownership in `.ai-team/TEAM.md`.
-If native subagents are available and the user requests team execution, use those capabilities;
+In small-team mode, use native subagents when available for useful independent work;
 otherwise perform the named roles sequentially. Do not invent an agent process or successful
 handoff. These portable role definitions do not themselves launch agent infrastructure.
 
@@ -115,23 +120,20 @@ handoff. These portable role definitions do not themselves launch agent infrastr
 Only these project skills were installed:
 
 {skill_lines}
+Selected skill files live in `{host['skills']}/`; let the harness discover and load them.
 <!-- toolkit:skills:end -->
 
-Search with `python .ai-toolkit/tools.py search <topic> --limit 8`; do not read the full search index.
+Search the central checkout with `python toolkit.py search <topic> --limit 8` when more expertise is needed.
 Use `python toolkit.py skills add --project <project> --skill <id> --dry-run` from the central
 checkout to preview additions. Updates preserve working documents and stop on conflicting skill edits.
-Start a fresh chat with `python .ai-toolkit/tools.py resume`, verify the current files, then continue.
-Checkpoint decisions, blockers, verification evidence and the next task at a milestone or handoff.
+Keep `docs/HANDOFF.md` short: current state, key decisions, actual checks, blockers and next step.
+A new chat reads that note and verifies the current files. Use native session resume when available.
 For visible UI, agree a representative design preview and record tokens/states in the design contract
 before expanding the application. Run the checks in docs/QUALITY-CHECKS.md; report unavailable checks.
 
-Check commands, inputs, tool availability and task authorization before executing skill scripts.
-Preserve user work. Never copy credentials or private MCP configuration into source control.
-Check installed framework versions and existing validation commands. Report tests actually run.
-
 {stack_instructions.strip()}
 ''')
-    add('.goosehints','Read AGENTS.md, docs/PROJECT-BRIEF.md and .ai-team/TEAM.md. Selected skills live in .agents/skills.\n')
+    for filename,content in instruction_files(harness).items():add(filename,content)
     add('docs/PROJECT-BRIEF.md',f'''# Project brief
 
 ## Goal
@@ -171,24 +173,28 @@ No framework, database, MCP connection or application dependency was provisioned
 Status: not yet designed. Do not treat this template as evidence of a completed design.
 '''
     add('docs/DESIGN-CONTRACT.md',contract)
-    add('.gitignore','.ai-toolkit/history/\n.ai-toolkit/operation.lock\n.ai-team/*.lock\n.ai-team/*.next.json\n')
+    add('.gitignore','.ai-toolkit/history/\n.ai-toolkit/operation.lock\n')
     for role in ('planner','designer','builder','reviewer'): add(f'.ai-team/roles/{role}.md',(root/f'library/agents/{role}.md').read_bytes())
     add('.ai-team/TEAM.md',(root/'library/agents/TEAM.md').read_text(encoding='utf-8')+f'\nSelected execution mode: **{team}**.\n')
-    add('.ai-team/tasks.json',json.dumps({'schemaVersion':1,'tasks':[]},indent=2)+'\n')
-    add('.ai-team/state.json',json.dumps({'schemaVersion':1,'summary':'Project resources installed; application work has not started.',
-        'nextTask':'Planner: clarify acceptance criteria, then prepare a representative design preview if there is a UI.',
-        'decisions':[f'Stack: {preset_id}; style: {style_id}; database: {database}; team: {team}'],
-        'blockers':[],'evidence':[]},indent=2)+'\n')
-    add('.ai-team/team.py',(root/'scripts/team.py').read_bytes())
-    add('.ai-toolkit/tools.py',(root/'scripts/project_tools.py').read_bytes())
+    add('docs/HANDOFF.md',f'''# Project handoff
+
+Current state: project instructions and selected skills installed; application work has not started.
+Decisions: {preset_id}; {style_id}; database {database}; team {team}.
+Checks: setup only; no application checks run yet.
+Blockers: none recorded.
+Next: define acceptance criteria and the first useful milestone; preview the design if there is a UI.
+
+Update this note at meaningful handoffs. Keep durable requirements in PROJECT-BRIEF.md and
+visual decisions in DESIGN-CONTRACT.md. Verify saved claims against current files before continuing.
+''')
     add('docs/QUALITY-CHECKS.md',(root/'library/instructions/quality-checks.md').read_bytes())
     add('.ai-toolkit/base/AGENTS.md',plan['AGENTS.md']['data'])
     add('docs/AI-TOOLKIT.md',f'''# Project toolkit
 
 Toolkit {catalog['version']}; preset `{preset_id}`; style `{style_id}`; team `{team}`.
 
-Begin with: "Read AGENTS.md and run the Planner, Designer, Builder and Reviewer workflow
-for docs/PROJECT-BRIEF.md. Use the shared catalog and only the skills needed."
+Begin with: "Read AGENTS.md and docs/HANDOFF.md, then follow the current request.
+Use the relevant roles and skills. A preparation-only request does not authorize building."
 
 Source toolkit: https://github.com/creativekamrul/ai-dev-toolkit
 Installed skills: {', '.join(selected)}.
@@ -198,19 +204,18 @@ Reproduce this setup with `python scripts/init-project.py --config <project.json
 ''')
     shared={'toolkitVersion':catalog['version'],'source':'https://github.com/creativekamrul/ai-dev-toolkit',
             'skills':[{k:entries[sid][k] for k in ('id','name','description','category','compatibility','validation')} for sid in selected],
-            'selectionReasons':reasons,'searchCommand':'python .ai-toolkit/tools.py search <topic> --limit 8'}
+            'selectionReasons':reasons,'harness':harness,'skillDirectory':host['skills'],
+            'searchCommand':'From the central checkout: python toolkit.py search <topic> --limit 8'}
     add('.ai-toolkit/catalog.json',json.dumps(shared,indent=2)+'\n')
-    index={'skills':[{'id':e['id'],'description':e['description'][:200],
-        'status':e['validation']['status'],'tags':e['technologies']+[e['category']]+policy['skills'].get(e['id'],{}).get('capabilities',[])} for e in catalog['skills']]}
-    add('.ai-toolkit/search-index.json',json.dumps(index,separators=(',',':'))+'\n')
     needs_review=[sid for sid in selected if entries[sid]['validation']['status']!='reviewed']
     if needs_review:
         add('.ai-toolkit/REVIEW-REQUIRED.md','# Selected community skills requiring review\n\n'+
             '\n'.join('- '+sid for sid in needs_review)+'\n\nThese packages passed license/metadata/static checks, not behavioral review. Before using their instructions or scripts, inspect the installed TOOLKIT-PROVENANCE.json and relevant files. Do not execute unreviewed scripts. User stack, style and authorization remain authoritative.\n')
-    config={'preset':preset_id,'style':style_id,'team':team,'brief':brief,'audience':audience,'database':database,'allow_screened':allow_screened,
+    config={'preset':preset_id,'style':style_id,'team':team,'harness':harness,'brief':brief,'audience':audience,'database':database,'allow_screened':allow_screened,
             'integrations':integrations,'add_skills':extras,'remove_skills':removed,'capabilities':capabilities}
     add('.ai-toolkit/project.json',json.dumps(config,indent=2)+'\n')
-    receipt={'schemaVersion':3,'toolkitVersion':catalog['version'],'preset':preset_id,'style':style_id,'skills':selected,
+    receipt={'schemaVersion':4,'toolkitVersion':catalog['version'],'preset':preset_id,'style':style_id,'harness':harness,'skills':selected,
+             'adaptations':adaptations,
              'files':[{'path':p,'sha256':v['sha256']} for p,v in sorted(plan.items())]}
     add('.ai-toolkit/installed.json',json.dumps(receipt,indent=2)+'\n')
     return plan,selected
@@ -233,6 +238,7 @@ def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ('destination','preset','style','team','brief','audience','database','integrations','add-skills','remove-skills','config','capabilities','name','projects-root'): parser.add_argument('--'+name)
     for name in ('noninteractive','dry-run','yes','list','allow-screened'): parser.add_argument('--'+name,action='store_true')
+    parser.add_argument('--harness',choices=HARNESSES)
     args=parser.parse_args(argv)
     presets=[read_json(p) for p in sorted((ROOT/'presets').glob('*.json'))]; styles=[read_json(p) for p in sorted((ROOT/'styles').glob('*.json'))]
     if args.list:
@@ -240,7 +246,7 @@ def main(argv=None):
     preferences=read_json(ROOT/'.local/preferences.json') if (ROOT/'.local/preferences.json').is_file() else {}
     saved=read_json(Path(args.config)) if args.config else {}
     values={name:getattr(args,name) if getattr(args,name) is not None else saved.get(name) for name in
-            ('destination','preset','style','team','brief','audience','database','integrations','add_skills','remove_skills','capabilities')}
+            ('destination','preset','style','team','brief','audience','database','integrations','add_skills','remove_skills','capabilities','harness')}
     if args.name and not values['destination']:
         if not re.fullmatch(r'[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}',args.name) or re.fullmatch(r'(?i)(con|prn|aux|nul|com[0-9]|lpt[0-9])',args.name):raise ValueError('Use a portable project name with letters, digits, hyphens or underscores')
         projects_root=Path(args.projects_root or preferences.get('projectsRoot') or ROOT.parent/'projects')
@@ -251,6 +257,8 @@ def main(argv=None):
         values['destination']=values['destination'] or input('Destination project directory (outside this toolkit): ').strip()
         values['preset']=values['preset'] or choose('Choose the technology stack',presets)
         values['style']=values['style'] or choose('Choose the visual direction',styles,'business')
+        values['harness']=values['harness'] or choose('Which coding harness?',[
+            {'id':key,'name':value['name']} for key,value in HARNESSES.items()],'codex')
         values['team']=values['team'] or choose('How should the team work?',[
             {'id':'small','name':'Four roles: Planner, Designer, Builder, Reviewer'},
             {'id':'solo','name':'One agent performs the roles sequentially'}],'small')
@@ -261,9 +269,9 @@ def main(argv=None):
         if values['remove_skills'] is None: values['remove_skills']=input('Remove optional skill IDs (comma separated; Enter for none): ')
     if not values['destination'] or not values['preset']: raise ValueError('--destination and --preset are required')
     plan,selected=build_plan(ROOT,Path(values['destination']),values['preset'],values['style'] or 'business',values['team'] or 'small',
-        values['brief'] or '',values['audience'] or '',values['database'] or 'none',split_ids(values['integrations']),split_ids(values['add_skills']),split_ids(values['remove_skills']),args.allow_screened or saved.get('allow_screened',False),split_ids(values['capabilities']))
+        values['brief'] or '',values['audience'] or '',values['database'] or 'none',split_ids(values['integrations']),split_ids(values['add_skills']),split_ids(values['remove_skills']),args.allow_screened or saved.get('allow_screened',False),split_ids(values['capabilities']),values['harness'] or 'codex')
     if apply_plan(plan,args.dry_run,args.yes,args.noninteractive):
-        print(f'Installed {len(selected)} skills and the project team. Open {Path(values["destination"]).absolute()} and say: Read AGENTS.md and start the first milestone.')
+        print(f'Installed {len(selected)} skills and project guidance. Open {Path(values["destination"]).absolute()} and say: Read AGENTS.md and docs/HANDOFF.md, then follow my current request.')
     return 0
 
 if __name__=='__main__':

@@ -61,7 +61,7 @@ No real member data, external service, authentication flow or live deployment wa
 
 Give a fresh agent START-HERE.md and one scenario brief above, with an empty external destination.
 Ask it to implement the useful minimal application, fill its design contract, test the behavior,
-and save a checkpoint. Keep its scope isolated. Compare actual behavior and rendered output with
+and write a short handoff note. Keep its scope isolated. Compare actual behavior and rendered output with
 the brief; record instructions it could not follow. Do not provide prior findings as hints.
 
 All fixture application code is original toolkit evaluation work. The WordPress plugin is

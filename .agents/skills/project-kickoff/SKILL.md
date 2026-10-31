@@ -1,23 +1,19 @@
 ---
 name: project-kickoff
-description: "Start a project from this toolkit by interviewing the user about goals, stack, design style and team setup, then installing a focused set of resources."
+description: "Start a separate project from this toolkit: clarify missing choices, select stack/design expertise and install resources for the chosen coding harness."
 ---
 
 # Project kickoff
 
-Use the existing harness for file operations, code search, commands, tool calls and delegation.
-This toolkit adds project choices, design expertise and specialist workflows; do not replace
-basic harness capabilities with generic skills or mandatory tool-wrapper installations.
+Read START-HERE.md at the toolkit root. Reuse choices already given, infer the current harness
+when known, and ask only for missing decisions that affect the project. Recommend a suitable
+stack and design direction from presets/ and styles/; do not default every project to Next.js.
 
-Read `START-HERE.md` from the toolkit repository root and follow its interview and setup flow.
-Reuse answers already supplied in the conversation. Offer the actual available presets and
-styles; do not assume Next.js or business styling. Keep the destination separate from the toolkit.
+Create the project outside this checkout using toolkit.py with the chosen harness adapter.
+Preview conflicts and apply the already authorized setup. Only selected skills become active.
+The host handles execution, planning, sessions and native delegation. The toolkit supplies
+specialist knowledge, role briefs and portable project documents.
 
-Use the shared catalog to select a small relevant skill set. Preserve existing files, preview the
-installation and use the user's existing authorization. After setup, read the destination's
-AGENTS.md and coordinate its Planner, Designer, Builder and Reviewer roles using supported host
-capabilities. Do not pretend role files launch subagents on their own.
-
-Use the standard-library `toolkit.py` helpers for preferences, recommendations, preview, installation
-and environment checks. Start a new chat in a generated project with its resume helper. The project
-search helper returns a bounded shortlist; do not read the entire passive library or search index.
+Open the destination as the working project, or give its exact path and a continuation prompt
+if the host cannot switch workspaces. Follow its brief, design contract and small-team guidance.
+At a meaningful handoff, update docs/HANDOFF.md using native file editing.

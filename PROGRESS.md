@@ -1,6 +1,43 @@
 # Progress and verification
 
-Updated 2026-11-01 (Asia/Dhaka), toolkit v0.3.0.
+Updated 2026-11-01 (Asia/Dhaka), toolkit v0.4.0.
+
+## v0.4: project starter and specialist library
+
+Removed the custom task tracker, checkpoint/resume runtime, environment doctor and generated
+full-library index. Projects now carry brief/design/handoff Markdown, quality criteria, role briefs
+and only the selected skills. Generic delivery and code-review skills are optional, not defaults.
+Trimmed generic frontend/delivery/testing advice while preserving domain and design decisions.
+
+Added native adapters for Codex, Claude Code and Goose, including safe harness switching through
+skills update. Markdown references to selected skill paths relocate with the adapter; original
+hashes and adaptations are recorded. WordPress detectors ignore both native skill directories.
+Legacy upgrades retain old task/state records, transfer notes into a missing handoff document,
+remove unchanged helpers and preserve project-owned content. Conflicts stop before writes;
+updates and harness switches are reversible through the existing skill transaction backups.
+
+### Current verification
+
+- 51 local behavior tests passed, including all 486 stack/style/harness setup combinations,
+  harness switching/config replay/rollback, WordPress commands under Claude's directory and
+  legacy migration preservation. Catalog/YAML/schema/license/hash validation passed.
+- Native Codex 0.148.0 and Goose 1.51.0 discovery passed for four generated projects each:
+  HTML/funky (2 skills), PHP/glass (3), WordPress plugin/funky (4), Next.js/editorial (2).
+  No model invocation or provider connection was used in these loader checks.
+- Claude Code is not installed here. Its adapter layout/import and installed WordPress commands
+  are tested; native Claude runtime discovery remains unverified.
+- Independent kickoff forward-test prepared a Claude-ready HTML/funky event project, filled
+  acceptance criteria/design choices/handoff, and respected a preparation-only request.
+  It ran before the final removal of the default generic review checklist. Its feedback led to
+  neutral continuation prompts that preserve setup-only scope. No application build was claimed.
+- CI runs Windows/Ubuntu helper checks and the existing HTML/PHP/Next.js/WordPress browser fixtures.
+  The GitHub Actions result for the published commit is the authoritative final CI status.
+
+The sections below record earlier v0.3 work. Its task/checkpoint helpers have been superseded;
+old application evaluations remain historical evidence, not a fresh evaluation of every skill.
+
+## Historical v0.3 record
+
 
 ## Harness boundary correction
 

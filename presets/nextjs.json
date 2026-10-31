@@ -1,11 +1,9 @@
 {
   "id": "nextjs",
   "name": "Next.js + TypeScript + Tailwind / shadcn",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "skills": [
-    "block-code-review",
-    "frontend-implementation",
-    "project-delivery"
+    "frontend-implementation"
   ],
   "instructions": "library/instructions/nextjs.md",
   "technologies": [

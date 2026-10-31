@@ -1,58 +1,35 @@
 # Architecture
 
-The host harness owns execution: file operations, code search, shell commands, tool access,
-permissions and native delegation. This toolkit owns project guidance, specialist knowledge,
-design decisions, handoffs and toolkit resource/state management. Imported instructions must
-not force a substitute tool for a basic operation already available in the harness.
+The host harness owns execution, native tools, planning, sessions and delegation. The toolkit
+owns a passive specialist library, project presets, design directions and safe resource copying.
 
-The toolkit has a passive central library and a focused active project installation.
-`library/skills` holds original core workflows, `library/community` holds pinned upstream packages,
-and `library/local` holds reusable local snapshots. Cloning brings bundled package files to the
-new computer. The library is not copied wholesale into `.agents/skills`.
+library/skills, library/community and library/local are passive. Only project-kickoff is active
+in this checkout, with Codex/Goose and Claude Code entrypoints. Startup instructions route to
+START-HERE.md. Native host discovery loads only selected project skills.
 
-`presets/` chooses technology guidance. `styles/` chooses visual guidance independently.
-`library/agents` defines the four portable roles. The one active toolkit skill is project-kickoff,
-which routes a new project request to START-HERE.md.
+toolkit.py uses Python 3.10+ standard library for new, preferences, recommend, search and skills
+management. It has no AI service, custom task tracker, session manager or runtime checker.
+The installer selects one harness adapter: AGENTS.md with .agents/skills for Codex/Goose,
+or CLAUDE.md importing AGENTS.md with .claude/skills for Claude Code. Goose gets .goosehints too.
+Role briefs are passed to native subagents rather than implementing another dispatch runtime.
 
-The Python standard-library initializer builds a complete plan in memory, checks source hashes
-and destination conflicts, then exclusively creates approved files. PowerShell is a thin argument
-wrapper. No catalog strings are evaluated as shell commands. It rejects path traversal, linked
-paths and file-as-directory parents. Unexpected IO failure can leave new files behind, but cannot
-overwrite an existing file. This is not an atomic multi-file transaction or a defense against a
-malicious concurrent process swapping directories.
+Projects receive brief/design/handoff documents, quality criteria, role briefs, installed-skill
+metadata, source hashes and a portable setup receipt. They contain no Python runtime helper or
+copy of the complete search index. The central checkout performs additional skill search/updates.
+Projects remain usable without that checkout after creation.
+Markdown references to selected skills are relocated to the chosen native skill directory.
+Receipts record each adapted file and its original hash; scripts and provenance stay byte-identical.
 
-Generated projects contain AGENTS.md, a Goose hint, chosen skill packages, a project brief,
-design contract, four role definitions, a task ledger, compact selected-skill catalog, bounded offline search index and installation
-receipt. A JSON answer file reproduces selection without adding machine paths to project config.
+Creation rejects destinations inside the checkout, links/reparse points, escaping paths and
+conflicting existing files. Dry runs write nothing; exclusive creates preserve concurrent edits.
+Individual file creation is protected, but the whole installation is not an atomic transaction.
 
-Catalog schema version 2 records identity, description, path, category, technologies, project
-types, compatibility, dependencies, source, license, revision, review state, file allowlist and
-SHA-256 hashes. The validator uses real YAML and JSON Schema parsers. Installations do not need
-either dependency. Imported metadata is preserved except documented discovery-name/path changes.
+Skill updates compare baseline, current and incoming hashes. They preserve working documents
+and detect conflicts before writes. AGENTS.md can update fully when unchanged; otherwise only
+the managed skill block changes for current-format projects. Legacy custom instructions require
+an explicit manual merge. Changing harness moves only receipt-owned skills and adapter files.
+Transactions back up previous bytes locally, and rollback refuses to overwrite subsequent edits.
 
-Reviewed defaults are distinct from screened optional packages. Screening covers evidence and
-static checks; it does not imply full behavioral compatibility. Local import revisions use content
-hashes when no trustworthy upstream commit exists. Pinned upstream imports retain full commits.
-
-The team uses real host delegation where available, otherwise sequential roles. No unsupported
-native agent adapter is installed. Tool integrations and application scaffolding are separate
-from selecting the AI resources.
-
-## v0.3 project lifecycle
-
-The root `toolkit.py` delegates to standard-library helpers. Preferences live only in ignored
-`.local/preferences.json`; a project name resolves under the chosen projects root. Initialization
-rejects every destination inside the checkout, not only its root. `manifests/curation.json` adds
-explicit capabilities and compatibility rules on top of stack/style selections. Recommendations
-explain why each default is selected; unknown optional packages are not assumed compatible.
-
-The installed catalog contains selected metadata only. `tools.py search` reads a separate compact
-index and returns a bounded shortlist (default 8, maximum 50). Detailed package bodies remain
-passive until selected. `tools.py checkpoint/resume` saves brief state separately from the task
-ledger; its claims must be checked against the current code. `doctor` probes tool availability only.
-
-Skill changes compare baseline/current/incoming hashes before writes. AGENTS.md has one managed
-skill-list block; its saved baseline permits preserving customized surrounding instructions.
-Arbitrary skill conflicts require a manual merge. A transaction records prior bytes and expected
-post-update hashes. Each file replacement is atomic; the whole multi-file update is recoverable,
-not atomic. Partial updates retain a prepared journal. Rollback refuses to overwrite later edits.
+Legacy task/state records remain historical project-owned data. Upgrade copies their content
+into a handoff note when none exists, removes unchanged generated runtime helpers, and replaces
+unchanged instructions. It never discards the original notes or a custom handoff document.

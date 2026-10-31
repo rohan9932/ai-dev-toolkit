@@ -1,37 +1,41 @@
-# Compatibility evidence
+# Harness adapters and evidence
 
-Checked locally on 2026-11-01. The installer requires Python 3.10+ and no third-party Python
-packages. Maintenance validation requires `requirements-dev.txt`. The PowerShell wrapper is
-covered by tests on PowerShell 7. The reviewed WordPress detectors require Node.js.
+The setup helper requires Python 3.10+ standard library only. Each generated project selects
+one harness; native delegation and tool availability are supplied by that installed host.
 
-Codex CLI 0.148.0 discovered every selected skill in four generated projects: HTML/CSS,
-PHP, WordPress plugin and Next.js. The checks used the real app-server skills/list protocol,
-with an isolated home and no model invocation. See PROGRESS.md for counts and scope.
-Start the coding agent in the generated project. An existing chat may need a skill refresh.
+| Harness | Instructions | Selected skills |
+|---|---|---|
+| Codex | AGENTS.md | .agents/skills/<name>/SKILL.md |
+| Claude Code | CLAUDE.md importing @AGENTS.md | .claude/skills/<name>/SKILL.md |
+| Goose | AGENTS.md and a short .goosehints | .agents/skills/<name>/SKILL.md |
 
-AGENTS.md, `.agents/skills/`, portable role instructions, resume/search helpers and `.goosehints` are generated.
-Goose and other hosts may require their skill extension or an explicit instruction to read these
-files. Their runtime behavior has not been verified here. Where native subagents are unavailable,
-the team workflow uses sequential roles and labels its review as self-review.
+This follows [Codex skills](https://learn.chatgpt.com/docs/build-skills) and
+[project instructions](https://learn.chatgpt.com/docs/agent-configuration/agents-md),
+[Claude Code skills](https://code.claude.com/docs/en/skills) and
+[shared instruction imports](https://code.claude.com/docs/en/memory#share-one-file-with-other-coding-tools),
+and Goose's official [skill locations](https://github.com/aaif-goose/goose/blob/main/documentation/docs/guides/context-engineering/using-skills.md)
+and [hint loader](https://github.com/aaif-goose/goose/blob/main/crates/goose/src/hints/load_hints.rs).
+Sources checked 2026-11-01. Claude's explicit import also supports versions that do not read
+AGENTS.md directly. No symlinks or global host configuration changes are needed.
 
-Only selected skill packages are copied to active discovery paths. The central catalog is shared
-metadata; other skills are available from the toolkit checkout. Additional screened packages may
-include nested platform entrypoints, old cross-skill paths or original-host tool dependencies.
-Review those before activation. No connection credentials are included.
+The toolkit checkout has both native kickoff entrypoints so any of these hosts can start setup.
+They contain identical instructions; Goose may discover either compatible copy, depending on its
+version. Generated projects have only one skill location, avoiding duplicate installed packages.
 
-The defaults are workflow resources, not generated production applications. Your coding agent
-uses the brief, selected stack and design contract to implement the application. WordPress/PHP,
-Node, database and design-service runtimes must be available where the actual project runs.
+Use `python toolkit.py skills update --project <folder> --harness claude --dry-run` from the
+central checkout to switch adapters; apply with --yes. Codex and Goose share their skill location.
+Start the host in the project afterward or refresh its skill discovery. Customized managed files
+cause conflicts when moving; merge them explicitly before switching. No adapter installs a host,
+model provider, browser, MCP service or framework runtime.
 
-Git attributes preserve exact package bytes so catalog hashes remain valid across operating
-systems. CI runs validation and behavior tests on Windows and Ubuntu; a passing loader test on
-Windows does not establish universal runtime compatibility or design quality.
+Automated tests exercise every stack/style/harness layout, selected bytes, conflict handling,
+portable config replay, harness switching and rollback. Layout tests do not prove native loading.
+Codex's real loader is tested separately without a model call; see PROGRESS.md for current evidence.
+Goose 1.51.0 native skills/list discovery is also verified; no model or provider call is needed.
+Claude Code layout and relocated WordPress commands are tested, but its native loader is not
+verified on this machine because Claude Code is not installed.
+Additional screened imports can still contain host-specific dependencies and require review.
 
-The v0.3 root CLI and installed project helpers use the Python standard library only. Role
-execution is supplied by the coding host. Some hosts cannot change an open chat's workspace;
-START-HERE gives a continuation prompt for opening the destination. Preferences are intentionally
-local to the cloned checkout, while selected skills and project state travel with each project.
-
-Optional evaluation dependencies (Node/Playwright/PHP/WordPress) are for toolkit maintainers and
-actual application work, not prerequisites for the conversational initializer. The environment
-checker reports executable presence; framework versions and service connections need their own checks.
+Maintainer application fixtures exercise representative HTML, PHP, Next.js and WordPress behavior.
+They do not establish that every future AI-generated application will meet its design contract.
+Normal project work needs only the chosen harness, relevant application runtimes and project files.

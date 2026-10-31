@@ -1,11 +1,9 @@
 {
   "id": "php",
   "name": "Plain PHP application",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "skills": [
-    "block-code-review",
     "php-development",
-    "project-delivery",
     "web-foundations"
   ],
   "instructions": "library/instructions/php.md",

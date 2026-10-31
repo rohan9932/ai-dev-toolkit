@@ -1,10 +1,8 @@
 {
   "id": "html-css",
   "name": "Plain HTML + CSS + JavaScript",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "skills": [
-    "block-code-review",
-    "project-delivery",
     "web-foundations"
   ],
   "instructions": "library/instructions/html-css.md",
